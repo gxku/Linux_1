@@ -1,0 +1,12 @@
+hsi2c@14E50000 {
+        status = "okay";
+        #if 0
+        samsung,hs-mode;
+        clock-frequency = <3000000>;
+        #endif        
+        /* dom0 i2c test device */
+        gyro-i2c@68 {
+            compatible = "mpu9250,gyro-i2c";
+            reg = <0x68>;    
+        };
+    };
