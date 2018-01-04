@@ -23,67 +23,46 @@ static const struct spi_device_id gyro_device_id[] = {
 	{}
 };
 
-#define WHO_AM_I		0x75
-#define PWR_MGMT_1 		0x6b
-#define MPU_RESET		0x80
+#define PWR_MGMT_1              0x6b
+#define SMPLRT_DIV              0x19
+#define CONFIG_CFG              0x1a
+#define USER_CONTROL    0x6a
+#define GYRO_CONFIG     0x1b
+#define ACCEL_CONFIG    0x1c
+#define WHO_AM_I                0x75
 
-	////////////////////////////////////
-	#if 0
-static int rx4581_set_reg(struct device *dev, unsigned char address,
-                unsigned char data)
+
+static int mpu_write_reg(struct spi_device *spi, uint8_t reg, uint8_t dat)
 {
-    struct spi_device *spi = to_spi_device(dev);
-    unsigned char buf[2];
+    uint8_t buf[2] = {reg, dat};
 
-    /* high nibble must be '0' to write *///no need
-    //buf[0] = address & 0x0f;
-	buf[0] = address ;//is also OK
-    buf[1] = data;
-
-    return spi_write_then_read(spi, buf, 2, NULL, 0);
+    return spi_write_then_read(spi, &buf, 2, NULL, 0);
 }
 
-static int rx4581_get_reg(struct device *dev, unsigned char address,
-                unsigned char *data)
+static int mpu_read_reg(struct spi_device *spi, uint8_t reg, uint8_t *dat)
 {
-    struct spi_device *spi = to_spi_device(dev);
+   /* Set MSB to indicate read */ 
+    uint8_t wb = reg | 0x80;
 
-    /* Set MSB to indicate read */
-    *data = address | 0x80;
-
-    return spi_write_then_read(spi, data, 1, data, 1);
+    return spi_write_then_read(spi, &wb, 1, dat, 1);
 }
-
-#endif
-////////////////////////////////////////////
 
 static void init_mpu9250_test(struct spi_device *spi)
 {
-	int ret;
-	uint8_t wmi;
-	uint8_t reg; 
-	uint8_t data;
-	
-#if 0
-	reg = PWR_MGMT_1;
-	data = 0;
-	ret = spi_write_then_read(spi,&reg,1,&data,1); 
-	printk("gyro reset %d, %d\n",ret,data);
+    int ret;
+    uint8_t wmi;
 
-	data = MPU_RESET;	
-	ret = spi_write_then_read(spi,&data,1,&reg,1); 
-	printk("gyro reset %d, %d\n",ret,reg);
-#endif
-	/* Set MSB to indicate read */
-	reg = WHO_AM_I|0x80; 
-	wmi = 0;
-	ret = spi_write_then_read(spi,&reg,1,&wmi,1); 
-	printk("gyro I am 0x%x, ret %d\n",wmi, ret);
-	
-	
-
-
+    mpu_write_reg(spi, PWR_MGMT_1, 0x0);
+    mpu_write_reg(spi, SMPLRT_DIV, 0x7);
+    mpu_write_reg(spi, CONFIG_CFG, 0x6);
+    mpu_write_reg(spi, USER_CONTROL, 0x0);
+    mpu_write_reg(spi, GYRO_CONFIG, 0x18);
+    mpu_write_reg(spi, ACCEL_CONFIG, 0x1);
+    mpu_read_reg(spi, WHO_AM_I,&wmi);
+    printk(">>> GYRO WAMI = 0x%x\n", wmi);
 }
+
+
 
 static int gyro_probe(struct spi_device *spi)
 {
