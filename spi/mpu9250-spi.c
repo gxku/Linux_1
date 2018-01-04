@@ -1,0 +1,120 @@
+#include <linux/init.h>
+#include <linux/module.h>
+#include <linux/errno.h>
+#include <linux/spi/spi.h>
+
+/** spi-IO-EXT_SPI
+* spi_6-14da0000
+* reg = <0x0 0x14da0000 0x100>
+* irq = <0 454 0>
+* clock = spi : 274, spi_busclk0 : 282
+**/
+
+#define GYPO_DRV_NAME "gyro-spi"
+
+static unsigned short gyro_addr;
+static struct of_device_id gyro_match_table[] = {
+	{ .compatible = "mpu9250,gyro-spi", },
+	{},
+};
+
+static const struct spi_device_id gyro_device_id[] = {
+	{GYPO_DRV_NAME, 0},
+	{}
+};
+
+#define WHO_AM_I		0x75
+#define PWR_MGMT_1 		0x6b
+#define MPU_RESET		0x80
+
+	////////////////////////////////////
+	#if 0
+static int rx4581_set_reg(struct device *dev, unsigned char address,
+                unsigned char data)
+{
+    struct spi_device *spi = to_spi_device(dev);
+    unsigned char buf[2];
+
+    /* high nibble must be '0' to write *///no need
+    //buf[0] = address & 0x0f;
+	buf[0] = address ;//is also OK
+    buf[1] = data;
+
+    return spi_write_then_read(spi, buf, 2, NULL, 0);
+}
+
+static int rx4581_get_reg(struct device *dev, unsigned char address,
+                unsigned char *data)
+{
+    struct spi_device *spi = to_spi_device(dev);
+
+    /* Set MSB to indicate read */
+    *data = address | 0x80;
+
+    return spi_write_then_read(spi, data, 1, data, 1);
+}
+
+#endif
+////////////////////////////////////////////
+
+static void init_mpu9250_test(struct spi_device *spi)
+{
+	int ret;
+	uint8_t wmi;
+	uint8_t reg; 
+	uint8_t data;
+	
+#if 0
+	reg = PWR_MGMT_1;
+	data = 0;
+	ret = spi_write_then_read(spi,&reg,1,&data,1); 
+	printk("gyro reset %d, %d\n",ret,data);
+
+	data = MPU_RESET;	
+	ret = spi_write_then_read(spi,&data,1,&reg,1); 
+	printk("gyro reset %d, %d\n",ret,reg);
+#endif
+	/* Set MSB to indicate read */
+	reg = WHO_AM_I|0x80; 
+	wmi = 0;
+	ret = spi_write_then_read(spi,&reg,1,&wmi,1); 
+	printk("gyro I am 0x%x, ret %d\n",wmi, ret);
+	
+	
+
+
+}
+
+static int gyro_probe(struct spi_device *spi)
+{
+	//i2c = (struct exynos5_i2c *)client->adapter->algo_data;
+	gyro_addr = spi->chip_select; 
+	//printk("gyro i2c probe on %s-%s,flags 0x%x, addr 0x%x, irq %d\n",
+	//		client->adapter->name,dev_name(i2c->dev), 
+	//		client->flags, client->addr, client->irq);
+	printk("gyro-spi reg : 0x%x\n",gyro_addr);
+	init_mpu9250_test(spi);
+	return 0;
+}
+
+static int gyro_remove(struct spi_device *spi)
+{
+	printk("gyro i2c remove\n");
+	return 0;
+}
+
+static struct spi_driver gyro_spi_driver = {
+	.driver = {
+		.name = GYPO_DRV_NAME,
+		.owner = THIS_MODULE,
+		.of_match_table = gyro_match_table,
+	},
+	.probe = gyro_probe,
+	.remove = gyro_remove,
+
+	.id_table = gyro_device_id,	
+};
+
+module_spi_driver(gyro_spi_driver);
+
+MODULE_LICENSE("GPL");

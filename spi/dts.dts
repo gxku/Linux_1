@@ -1,0 +1,38 @@
+spi@14da0000 {
+  num-cs = <2>;
+  status = "okay";
+  /* dom0 spi6 mpu9250 device */
+  gyro-spi@0 {
+   /*mode0: CPOL=0,CPHA 0*/
+   #if 0
+   spi-cpol;
+   #endif
+   #if 0
+   spi-cpha;
+   #endif
+   spi-max-frequency = <20000000>;
+   compatible = "mpu9250,gyro-spi";
+   reg = <0x0>;
+   controller-data {
+    cs-gpio = <&gpe4 1 0>;
+    samsung,spi-feedback-delay = <0>;
+   };
+  };
+  /* dom0 spi6 bmp280 device */
+  bmp-spi@1 {
+   /*mode0: CPOL=0,CPHA 0*/
+   #if 0
+   spi-cpol;
+   #endif
+   #if 0
+   spi-cpha;
+   #endif
+   spi-max-frequency = <20000000>;
+   compatible = "mpu9250,bmp-spi";
+   reg = <0x1>;
+   controller-data {
+    cs-gpio = <&gpf3 4 0>;
+    samsung,spi-feedback-delay = <0>;
+   };
+  };
+ };
