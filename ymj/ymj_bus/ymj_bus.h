@@ -13,7 +13,7 @@ extern struct bus_type ymj_bus_type;
 
 struct ymj_device {
 	char *name;
-	struct ymj_driver *driver;
+//	struct ymj_driver *driver;
 	struct device dev;
 };
 

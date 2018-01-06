@@ -8,7 +8,7 @@
 #include "ymj_bus.h"  
 
 
-#if 1 //for device tree
+#if 0 //for device tree
 
 static struct ymj_device my_device; 
 

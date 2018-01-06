@@ -76,10 +76,9 @@ static int __init ymj_kobj_init(void)
 	int ret=0;
 
 	//create kobject
-	ymj_kobj = kobject_create_and_add("kobject_ymj",kernel_kobj);
+	ymj_kobj = kobject_create_and_add("kobject_ymj",NULL/*kernel_kobj*/);
 	if (!ymj_kobj)
 		return -ENOMEM;
-
 	//create files for this kobject
 	ret = sysfs_create_group(ymj_kobj,&attr_group);
 	if (ret)

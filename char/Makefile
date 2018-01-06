@@ -1,8 +1,9 @@
 obj-m := hello.o  
 #CROSS_COMPILE=/home/root_work/am335x_4220_tmp/mimi_am335x_4220_v2/cross_compiler/linux-devkit/sysroots/x86_64-arago-linux/usr/bin/arm-linux-gnueabihf-
+CROSS_COMPILE=
   
 #KERNEL_DIR := /home/root_work/am335x_4220_tmp/mimi_am335x_4220_v2/source/linux-4.1.6+gitAUTOINC+52c4aa7cdb-g52c4aa7/
-KERNEL_DIR := /lib/modules/3.13.0-24-generic/build/ 
+KERNEL_DIR := /lib/modules/3.13.0-32-generic/build/ 
 PWD := $(shell pwd)  
     
 default:  
